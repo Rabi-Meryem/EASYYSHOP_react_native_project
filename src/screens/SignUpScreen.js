@@ -1,74 +1,3 @@
-/*import React, { useState } from "react";
-import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
-import { Picker } from '@react-native-picker/picker';
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../services/firebaseConfig";
-
-export default function SignUpScreen({ navigation }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [profilePicture, setProfilePicture] = useState("");
-  const [role, setRole] = useState("client"); // valeur par défaut
-
-  const handleSignUp = async () => {
-    try {
-       // 1️⃣ Créer compte Firebase
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const firebaseUser = userCredential.user;
-
-    console.log("Firebase User créé :", firebaseUser.uid);
-
-      const response = await fetch("http://192.168.8.184:5000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({  firebaseUid: firebaseUser.uid, name, email,  profilePicture, role }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        Alert.alert("Inscription réussie !");
-        navigation.navigate("SignIn");
-      } else {
-        Alert.alert("Erreur", data.message);
-      }
-    } catch (err) {
-      console.log("Erreur signup :", err.message);
-    Alert.alert("Erreur", err.message);
-    }
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text>Nom :</Text>
-      <TextInput style={styles.input} value={name} onChangeText={setName} />
-
-      <Text>Email :</Text>
-      <TextInput style={styles.input} value={email} onChangeText={setEmail} />
-
-      <Text>Mot de passe :</Text>
-      <TextInput style={styles.input} value={password} onChangeText={setPassword} secureTextEntry />
-
-      <Text>Photo de profil (URL) :</Text>
-      <TextInput style={styles.input} value={profilePicture} onChangeText={setProfilePicture} />
-
-      <Text>Type :</Text>
-      <Picker selectedValue={role} onValueChange={(itemValue) => setRole(itemValue)}>
-        <Picker.Item label="Client" value="client" />
-        <Picker.Item label="Propriétaire de store" value="storeowner" />
-      </Picker>
-
-      <Button title="S'inscrire" onPress={handleSignUp} />
-      <Button title="Aller à la connexion" onPress={() => navigation.navigate("SignIn")} />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  input: { borderWidth: 1, padding: 10, marginVertical: 5, borderRadius: 5 },
-});
-*/
-
 import React, { useState } from "react";
 import { 
   View, 
@@ -79,7 +8,10 @@ import {
   StyleSheet, 
   SafeAreaView,
   Modal,
-  Image
+  Image,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -123,7 +55,7 @@ export default function SignUpScreen({ navigation }) {
 
       console.log("Firebase User créé :", firebaseUser.uid);
 
-      const response = await fetch("http://192.168.8.184:5000/api/auth/signup", {
+      const response = await fetch("http://192.168.0.115:5000/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ firebaseUid: firebaseUser.uid, name, email, profilePicture, role }),
@@ -146,7 +78,14 @@ export default function SignUpScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
         {/* Logo */}
         <View style={styles.logoContainer}>
           <Ionicons name="shirt-outline" size={50} color="#5CA099" />
@@ -229,14 +168,22 @@ export default function SignUpScreen({ navigation }) {
             Déjà un compte ? <Text style={styles.linkBold}>Se connecter</Text>
           </Text>
         </TouchableOpacity>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
-  content: { flex: 1, paddingHorizontal: 30, justifyContent: 'center', alignItems: 'center' },
+  content: { flex: 1, width: '100%' },
+  scrollContent: { 
+    flexGrow: 1, 
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+    alignItems: 'center'
+  },
   logoContainer: { alignItems: 'center', marginBottom: 40 },
   logoText: { fontSize: 28, fontWeight: '300', color: '#5CA099', letterSpacing: 2, marginTop: 10 },
   form: { width: '100%', marginBottom: 20 },

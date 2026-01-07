@@ -29,11 +29,17 @@ const userSchema = new mongoose.Schema(
       enum: ["storeowner", "client"],
       required: true,
     },
+    bio: {
+       type: String,
+       default: "",
+   },
+
 
     followers: {
       type: [mongoose.Schema.Types.ObjectId],
       default: [],
     },
+
 
     followingStores: {
       type: [mongoose.Schema.Types.ObjectId],

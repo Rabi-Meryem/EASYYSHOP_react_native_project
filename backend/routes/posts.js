@@ -1,15 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const Post = require("../models/Post");
+const User = require("../models/User");
 
 /* =========================
    🔹 CRÉER UN POST
 ========================= */
 router.post("/", async (req, res) => {
   try {
-    const { userId, username, userProfilePicture, category, images } = req.body;
+    const {
+      userId,
+      username,
+      userProfilePicture,
+      category,
+      images,
+      description,
+    } = req.body;
 
-    if (!userId || !username || !category || !images) {
+    if (!userId || !username || !category || !images || !description) {
       return res.status(400).json({ message: "Champs manquants" });
     }
 
@@ -19,10 +27,14 @@ router.post("/", async (req, res) => {
       userProfilePicture,
       category,
       images,
+      description,
+      comments: [],
+      commentsCount: 0,
+      likes: [],
     });
 
     await post.save();
-    res.status(201).json({ message: "Post créé avec succès", post });
+    res.status(201).json({ post });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -45,9 +57,9 @@ router.get("/", async (req, res) => {
 ========================= */
 router.get("/user/:userId", async (req, res) => {
   try {
-    const posts = await Post.find({ userId: req.params.userId })
-      .sort({ createdAt: -1 });
-
+    const posts = await Post.find({ userId: req.params.userId }).sort({
+      createdAt: -1,
+    });
     res.json({ posts });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -55,7 +67,7 @@ router.get("/user/:userId", async (req, res) => {
 });
 
 /* =========================
-   🔹 LIKER / UNLIKER UN POST
+   🔹 LIKE / UNLIKE
 ========================= */
 router.post("/like", async (req, res) => {
   try {
@@ -64,10 +76,10 @@ router.post("/like", async (req, res) => {
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post introuvable" });
 
-    const alreadyLiked = post.likes.includes(userId);
+    const index = post.likes.indexOf(userId);
 
-    if (alreadyLiked) {
-      post.likes = post.likes.filter(id => id !== userId);
+    if (index >= 0) {
+      post.likes.splice(index, 1);
     } else {
       post.likes.push(userId);
     }
@@ -80,59 +92,58 @@ router.post("/like", async (req, res) => {
 });
 
 /* =========================
-   🔹 COMMENTER UN POST
+   🔹 COMMENTER
 ========================= */
 router.post("/comment", async (req, res) => {
   try {
-    const { postId, userId, username, text } = req.body;
+    const { postId, userId, text } = req.body;
+
+    if (!text) return res.status(400).json({ message: "Commentaire vide" });
 
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post introuvable" });
 
-    post.comments.push({ userId, username, text });
+    // 🔥 récupérer l'utilisateur depuis MongoDB
+    const user = await User.findOne({ firebaseUid: userId });
+    if (!user) return res.status(404).json({ message: "Utilisateur introuvable" });
+
+    post.comments.push({
+      userId,
+      username: user.name,
+      userAvatar: user.profilePicture || "",
+      text,
+      createdAt: new Date(),
+    });
+
+    post.commentsCount = post.comments.length;
     await post.save();
 
-    res.json({ comments: post.comments });
+    res.json({ comments: post.comments, commentsCount: post.commentsCount });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
+
 /* =========================
-   🔹 ENREGISTRER / RETIRER UN POST
+   🔹 SUPPRIMER COMMENTAIRE
 ========================= */
-router.post("/save", async (req, res) => {
+router.post("/delete-comment", async (req, res) => {
   try {
-    const { postId, userId } = req.body;
+    const { postId, commentId, userId } = req.body;
 
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ message: "Post introuvable" });
 
-    const alreadySaved = post.savedBy.includes(userId);
+    // Supprimer seulement si c’est le commentaire de l’utilisateur
+    post.comments = post.comments.filter(
+      (c) => !(c._id.toString() === commentId && c.userId === userId)
+    );
 
-    if (alreadySaved) {
-      post.savedBy = post.savedBy.filter(id => id !== userId);
-    } else {
-      post.savedBy.push(userId);
-    }
-
+    post.commentsCount = post.comments.length;
     await post.save();
-    res.json({ savedBy: post.savedBy });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 
-/* =========================
-   🔹 SUPPRIMER UN POST (STORE OWNER)
-========================= */
-router.delete("/:postId", async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.postId);
-    if (!post) return res.status(404).json({ message: "Post introuvable" });
-
-    await post.deleteOne();
-    res.json({ message: "Post supprimé" });
+    res.json({ comments: post.comments, commentsCount: post.commentsCount });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

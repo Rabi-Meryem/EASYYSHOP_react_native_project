@@ -24,7 +24,8 @@ const uri = process.env.MONGODB_URI || "mongodb+srv://meryem_monia:Ew8FjLsLh4t96
 mongoose.connect(uri)
   .then(() => console.log("MongoDB connecté ✅"))
   .catch(err => console.log("Erreur MongoDB ❌", err));
-
+app.use(express.json({ limit: '10mb' })); // si images base64 lourdes
+app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);

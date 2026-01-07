@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import AddPostScreen from "../screens/AddPostScreen";
+import EditProfileScreen from "../screens/EditProfileScreen";
 
 // Screens
 import SignInScreen from "../screens/SignInScreen";
@@ -12,6 +14,8 @@ import HomeScreen from "../screens/HomeScreen";
 import SearchScreen from "../screens/SearchScreen";
 import MessagesScreen from "../screens/MessagesScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import CommentScreen from "../screens/CommentScreen";
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -47,13 +51,21 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {/* Écrans de login */}
-        <Stack.Screen name="SignIn" component={SignInScreen} />
-        <Stack.Screen name="SignUp" component={SignUpScreen} />
+        {/* Auth */}
+  <Stack.Screen name="SignIn" component={SignInScreen} />
+  <Stack.Screen name="SignUp" component={SignUpScreen} />
 
-        {/* Écran principal de l'app après login */}
-        <Stack.Screen name="AppTabs" component={AppTabs} />
+  {/* Tabs */}
+  <Stack.Screen name="AppTabs" component={AppTabs} />
+   
+   <Stack.Screen name="Comments" component={CommentScreen} options={{ title: "Commentaires" }}/>
+   <Stack.Screen  name="EditProfile" component={EditProfileScreen}  options={{ title: "Modifier le Profil" }}/>
+
+
+  {/* Screens secondaires */}
+  <Stack.Screen name="AddPost" component={AddPostScreen} />
       </Stack.Navigator>
     </NavigationContainer>
+
   );
 }

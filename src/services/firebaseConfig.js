@@ -1,8 +1,6 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,8 +14,16 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const API_URL = "http://192.168.8.184:5000/api";
+
+// ✅ Auth avec persistance sur AsyncStorage
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
+
+// API URL
+export const API_URL = "http://192.168.194.151:5000/api";
+
+// Fonctions posts
 export const getPosts = () => fetch(`${API_URL}/posts`).then(res => res.json());
 export const likePost = (postId, userId) =>
   fetch(`${API_URL}/posts/${postId}/like`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({userId}) });

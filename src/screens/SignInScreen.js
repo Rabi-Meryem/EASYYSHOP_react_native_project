@@ -6,12 +6,17 @@ import {
   TextInput, 
   TouchableOpacity, 
   SafeAreaView,
-  Modal ,
-  Alert
+  Modal,
+  Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../services/firebaseConfig";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -22,13 +27,13 @@ export default function SignInScreen({ navigation }) {
     try {
       // 1️⃣ Connexion Firebase
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log("Firebase connecté :", userCredential.user.uid);
-
+      console.log("Firebase connecté :",userCredential.user.uid);
+      const firebaseUid = userCredential.user.uid; 
       // 2️⃣ Récupérer le profil depuis MongoDB
-      const response = await fetch("http://192.168.8.184:5000/api/auth/profile", {
+      const response = await fetch("http://192.168.0.115:5000/api/auth/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ firebaseUid }),
       });
 
       const data = await response.json();
@@ -36,6 +41,7 @@ export default function SignInScreen({ navigation }) {
       if (response.ok) {
         Alert.alert("Connexion réussie !");
         console.log("Profil utilisateur :", data.user);
+        await AsyncStorage.setItem("user", JSON.stringify(data.user));
          navigation.replace("AppTabs"); 
 
       } else {
@@ -49,51 +55,64 @@ export default function SignInScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <Ionicons name="shirt-outline" size={50} color="#5CA099" />
-          <Text style={styles.logoText}>EASYSHOP</Text>
-        </View>
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Logo */}
+          <View style={styles.logoContainer}>
+            <Ionicons name="shirt-outline" size={50} color="#5CA099" />
+            <Text style={styles.logoText}>EASYSHOP</Text>
+          </View>
 
-        {/* Formulaire */}
-        <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-        </View>
+          {/* Formulaire */}
+          <View style={styles.form}>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+          </View>
 
-    
-    {/* Bouton login */}
-        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-          <Text style={styles.buttonText}>Se connecter</Text>
-        </TouchableOpacity>
+          {/* Bouton login */}
+          <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+            <Text style={styles.buttonText}>Se connecter</Text>
+          </TouchableOpacity>
 
-        {/* Footer */}
-        <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate("SignUp")}>
-          <Text style={styles.footerText}>
-            Pas de compte ? <Text style={styles.linkBold}>S'inscrire</Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
+          {/* Footer */}
+          <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate("SignUp")}>
+            <Text style={styles.footerText}>
+              Pas de compte ? <Text style={styles.linkBold}>S'inscrire</Text>
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
-  content: { flex: 1, paddingHorizontal: 30, justifyContent: 'center' },
+  content: { flex: 1, width: '100%' },
+  scrollContent: { 
+    flexGrow: 1, 
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+    paddingVertical: 20
+  },
   logoContainer: { alignItems: 'center', marginBottom: 40 },
   logoText: { fontSize: 28, fontWeight: '300', color: '#5CA099', letterSpacing: 3 },
   form: { width: '100%', marginBottom: 20 },
