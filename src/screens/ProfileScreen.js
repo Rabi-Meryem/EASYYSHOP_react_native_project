@@ -148,8 +148,12 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      {/* EN-TÊTE AVEC NOM D'UTILISATEUR */}
+      <View style={styles.topHeader}>
+        <Text style={styles.topHeaderText}>{user.name}</Text>
+      </View>
 
+      <ScrollView>
         {/* PROFILE HEADER */}
         <View style={styles.profileInfoContainer}>
           <View style={styles.headerRow}>
@@ -218,6 +222,27 @@ export default function ProfileScreen({ navigation }) {
 ===================== */
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
+  topHeader: {
+    paddingTop: 35,  // Augmenté pour déplacer le contenu plus bas
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    // Ajout d'une ombre légère pour une meilleure séparation visuelle
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+    zIndex: 10, // Pour s'assurer que l'en-tête reste au-dessus du contenu défilant
+  },
+  topHeaderText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
   profileInfoContainer: { padding: 20 },
   headerRow: { flexDirection: 'row', alignItems: 'center' },
   profileAvatar: { width: 80, height: 80, borderRadius: 40 },
@@ -260,11 +285,47 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  postContainer: { marginBottom: 20 },
-  postImage: { width, height: width * 0.8 },
-  description: { padding: 10 },
-
-  actionsRow: { flexDirection: 'row', paddingHorizontal: 10 },
-  actionBtn: { flexDirection: 'row', marginRight: 20, alignItems: 'center' },
-  actionText: { marginLeft: 5 },
+  // Styles pour les posts
+  postContainer: {
+    marginBottom: 25,
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    marginHorizontal: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    overflow: 'hidden',
+    marginTop: 10,
+  },
+  postImage: {
+    width: '100%',
+    aspectRatio: 1, // Pour des images carrées
+    resizeMode: 'contain', // Pour s'assurer que toute l'image est visible
+    backgroundColor: '#f5f5f5',
+  },
+  description: {
+    padding: 12,
+    color: '#333',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  actionBtn: {
+    flexDirection: 'row',
+    marginRight: 25,
+    alignItems: 'center',
+    padding: 5,
+  },
+  actionText: {
+    marginLeft: 5,
+    color: '#333',
+    fontSize: 14,
+  },
 });

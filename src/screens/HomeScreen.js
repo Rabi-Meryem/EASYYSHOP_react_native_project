@@ -272,6 +272,15 @@ const styles = StyleSheet.create({
   post: {
     marginBottom: 25,
     backgroundColor: "#FFF",
+    borderRadius: 15,
+    marginHorizontal: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    overflow: 'hidden',
+    marginTop: 10,
   },
 
   postHeader: {
@@ -293,8 +302,10 @@ const styles = StyleSheet.create({
   },
 
   postImage: {
-    width: width,
-    height: width * 1.1,
+    width: '100%',
+    aspectRatio: 1, // Pour des images carrées
+    resizeMode: 'contain', // Pour s'assurer que toute l'image est visible
+    backgroundColor: '#f5f5f5',
   },
 
   actions: {

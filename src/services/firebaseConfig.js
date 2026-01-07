@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeAuth, getReactNativePersistence, getAuth } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Your web app's Firebase configuration
@@ -12,13 +12,35 @@ const firebaseConfig = {
   appId: "1:862981589236:web:a212fbdedfac8cdfdd76a1"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialisation conditionnelle de Firebase
+let app;
+let authInstance;
 
-// ✅ Auth avec persistance sur AsyncStorage
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+// Vérifier si une application Firebase est déjà initialisée
+if (getApps().length === 0) {
+  // Si aucune application n'est initialisée, on en crée une nouvelle
+  app = initializeApp(firebaseConfig);
+  authInstance = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage)
+  });
+} else {
+  // Si une application existe déjà, on la récupère
+  app = getApp();
+  try {
+    authInstance = getAuth(app);
+  } catch (e) {
+    // Si l'auth n'est pas encore initialisée
+    if (e.code === 'auth/no-auth') {
+      authInstance = initializeAuth(app, {
+        persistence: getReactNativePersistence(AsyncStorage)
+      });
+    } else {
+      throw e;
+    }
+  }
+}
+
+export const auth = authInstance;
 
 // API URL
 export const API_URL = "http://192.168.194.151:5000/api";
