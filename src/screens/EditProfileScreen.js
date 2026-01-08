@@ -13,7 +13,7 @@ import {
   Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from 'expo-image-picker';//sert a ouvrir la galeire 
 
 
 export default function EditProfileScreen({ navigation, route }) {
@@ -81,7 +81,7 @@ const handleSave = async () => {
           <Ionicons name="close-outline" size={28} color="#333" />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Edit Profile</Text>
+        <Text style={styles.headerTitle}>Modifier Profil</Text>
 
         <TouchableOpacity onPress={handleSave}>
           <Ionicons name="checkmark-outline" size={28} color="#5CA099" />
@@ -107,7 +107,7 @@ const handleSave = async () => {
           {/* Form */}
           <View style={styles.form}>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Full Name</Text>
+              <Text style={styles.label}> Nom </Text>
               <TextInput
                 style={styles.input}
                 value={name}

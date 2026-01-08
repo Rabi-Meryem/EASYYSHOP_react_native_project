@@ -26,30 +26,80 @@ export default function SignInScreen({ navigation }) {
   const handleSignIn = async () => {
     try {
       // 1️⃣ Connexion Firebase
+      console.log("Tentative de connexion Firebase...");
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log("Firebase connecté :",userCredential.user.uid);
-      const firebaseUid = userCredential.user.uid; 
-      // 2️⃣ Récupérer le profil depuis MongoDB
-      const response = await fetch("http://192.168.0.115:5000/api/auth/profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firebaseUid }),
-      });
+      console.log("✅ Firebase connecté avec succès, UID:", userCredential.user.uid);
+      
+      const firebaseUid = userCredential.user.uid;
+      const apiUrl = "http://192.168.0.115:5000/api/auth/profile";
+      
+      console.log("🔄 Tentative de récupération du profil utilisateur...");
+      console.log("URL de l'API:", apiUrl);
+      
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({ firebaseUid }),
+        });
 
-      const data = await response.json();
+        console.log("📡 Réponse du serveur reçue, statut:", response.status);
+        
+        let data;
+        try {
+          data = await response.json();
+          console.log("📋 Données brutes de la réponse:", JSON.stringify(data, null, 2));
+        } catch (parseError) {
+          console.error("❌ Erreur lors du parsing de la réponse:", parseError);
+          throw new Error("La réponse du serveur est invalide");
+        }
 
-      if (response.ok) {
-        Alert.alert("Connexion réussie !");
-        console.log("Profil utilisateur :", data.user);
-        await AsyncStorage.setItem("user", JSON.stringify(data.user));
-         navigation.replace("AppTabs"); 
-
-      } else {
-        Alert.alert("Erreur", data.message);
+        if (response.ok) {
+          if (data && data.user) {
+            console.log("👤 Données utilisateur reçues:", data.user);
+            await AsyncStorage.setItem("user", JSON.stringify(data.user));
+            console.log("💾 Utilisateur enregistré dans AsyncStorage");
+            
+            Alert.alert("✅ Connexion réussie !");
+            navigation.replace("AppTabs");
+          } else {
+            console.error("❌ Données utilisateur manquantes dans la réponse");
+            Alert.alert("Erreur", "Données utilisateur manquantes");
+          }
+        } else {
+          console.error("❌ Erreur API:", data.message || "Erreur inconnue");
+          Alert.alert("Erreur", data.message || "Erreur lors de la connexion");
+        }
+      } catch (apiError) {
+        console.error("❌ Erreur lors de l'appel API:", {
+          message: apiError.message,
+          stack: apiError.stack,
+          name: apiError.name
+        });
+        throw apiError;
       }
     } catch (err) {
-      console.log("Erreur login :", err.message);
-      Alert.alert("Erreur", err.message);
+      console.error("❌ Erreur de connexion complète:", {
+        message: err.message,
+        code: err.code,
+        name: err.name
+      });
+      
+      let errorMessage = "Erreur de connexion";
+      
+      // Gestion des erreurs courantes
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        errorMessage = "Email ou mot de passe incorrect";
+      } else if (err.code === 'auth/network-request-failed') {
+        errorMessage = "Erreur réseau. Vérifiez votre connexion Internet";
+      } else if (err.message.includes('Network request failed')) {
+        errorMessage = "Impossible de joindre le serveur. Vérifiez votre connexion";
+      }
+      
+      Alert.alert("Erreur", errorMessage);
     }
   };
 

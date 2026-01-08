@@ -9,14 +9,14 @@ import {
   Dimensions,
   Animated,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { auth } from "../services/firebaseConfig";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";// pour uiliser les icones comme coeur like etc 
+import { auth } from "../services/firebaseConfig";//importer de firebase auth il sert a savoir qui est connecte 
+import { SafeAreaView } from "react-native-safe-area-context";  //il sert a adapter le code avec l ecran 
 
 const { width } = Dimensions.get("window");
 
-export default function HomeScreen({ navigation, route }) {
-  const [posts, setPosts] = useState([]);
+export default function HomeScreen({ navigation, route }) {// navigation et route sont des parametre passer a la fonction homescreen pour navigation gere la navigation entre les ecran et route passe les donnes entre les ecran 
+  const [posts, setPosts] = useState([]);//“Stocker les données dans post ,garder les informations récupérées (comme les posts) en mémoire pour que Flatlist puisse les afficher sur l’écran.
   const [filter, setFilter] = useState("all");
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -47,13 +47,13 @@ export default function HomeScreen({ navigation, route }) {
 
   /* ================= LIKE ANIMATION ================= */
   const animateLike = () => {
-    Animated.sequence([
-      Animated.timing(scaleAnim, {
-        toValue: 1.4,
+    Animated.sequence([//permet de enchaîner plusieurs animations les unes après les autres: 1.Grossir le bouton 2.Revenir à la taille normale
+        Animated.timing(scaleAnim, {//animation lors du clique 
+        toValue: 1.4,//taille de l animation 
         duration: 150,
         useNativeDriver: true,
       }),
-      Animated.timing(scaleAnim, {
+      Animated.timing(scaleAnim, {//animation taille normal
         toValue: 1,
         duration: 150,
         useNativeDriver: true,
@@ -77,13 +77,13 @@ export default function HomeScreen({ navigation, route }) {
 
   /* ================= FILTER POSTS ================= */
   const filteredPosts =
-    filter === "all"
-      ? posts
-      : posts.filter((p) => p.category === filter);
+    filter === "all" // si le filter est all
+      ? posts // on garde tous les post, ? condition vrai 
+      : posts.filter((p) => p.category === filter);// sinon on applique le filter ,: sinon 
 
   /* ================= RENDER POST ================= */
   const renderPost = ({ item }) => {
-    const isLiked = item.likes?.includes(auth.currentUser?.uid);
+    const isLiked = item.likes?.includes(auth.currentUser?.uid);//Vérifie si l’utilisateur connecté a déjà liké ce post ,item.likes = tableau des IDs des utilisateurs qui ont liké le post
 
     return (
       <View style={styles.post}>
@@ -91,8 +91,8 @@ export default function HomeScreen({ navigation, route }) {
         {/* ===== POST HEADER ===== */}
         <View style={styles.postHeader}>
           <Image
-            source={{ uri: item.userProfilePicture }}
-            style={styles.avatar}
+            source={{ uri: item.userProfilePicture }}// affiche photo de profil de l utilisateur
+            style={styles.avatar}// style de l image est arrondi
           />
           <Text style={styles.ownerName}>{item.username}</Text>
         </View>
@@ -112,11 +112,12 @@ export default function HomeScreen({ navigation, route }) {
                 toggleLike(item._id);
               }}
             >
+             
               <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
                 <Ionicons
-                  name={isLiked ? "heart" : "heart-outline"}
+                  name={isLiked ? "heart" : "heart-outline"}//montre un coueur rempli si isliked=true sinon coueur vide 
                   size={26}
-                  color={isLiked ? "red" : "#333"}
+                  color={isLiked ? "red" : "#333"}// change la couleur rouge si aime sinon gris 
                 />
               </Animated.View>
             </TouchableOpacity>
@@ -126,15 +127,15 @@ export default function HomeScreen({ navigation, route }) {
                 navigation.navigate("Comments", { 
                   postId: item._id, 
                   onCommentAdded: (newCount) => {
-                    setPosts(prevPosts => 
-                      prevPosts.map(p => 
-                        p._id === item._id 
-                          ? { ...p, commentsCount: newCount } 
-                          : p
+                    setPosts(prevPosts => //prevPosts = l’ancienne valeur de posts
+                      prevPosts.map(p => //prevPosts est un tableau des posts(posts 1 poss 2 etc) ,map parcourir chaque post,p un seul post à la fois
+                        p._id === item._id //on compare le post actuell(p) avec le post clique (item) Si c’est le même post, on le modifie Sinon, on le laisse tel quel
+                          ? { ...p, commentsCount: newCount } //SI c’est le bon post ...p → garde toutes les infos du post commentsCount: newCount → met à jour فقط le nombre de commentaires
+                          : p // sinon on retourne le post sans aucune modification
                       )
                     );
-                    // Rafraîchir les données après un court délai pour s'assurer de la synchronisation
-                    setTimeout(fetchPosts, 500);
+                    
+                    setTimeout(fetchPosts, 500);// setTimeout → attend 500 ms (0,5 seconde)
                   }
                 });
               }}

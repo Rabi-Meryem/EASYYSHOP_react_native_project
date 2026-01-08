@@ -62,8 +62,6 @@ const sendComment = async () => {
       body: JSON.stringify({
         postId,
         userId: currentUser.uid,
-       // username: currentUser.displayName || "User",
-       // userAvatar: currentUser.photoURL,
         text,
       }),
     });
@@ -87,8 +85,7 @@ const sendComment = async () => {
       route.params.onCommentAdded(data.commentsCount); // renvoie le nouveau nombre
     }
 
-    // 🔄 si tu veux refetch du backend (optionnel)
-    // await fetchComments();
+    
 
   } catch (err) {
     console.log("Erreur sendComment:", err);
@@ -129,7 +126,7 @@ const sendComment = async () => {
   /* ================= UI ================= */
 
   const renderItem = ({ item }) => {
-    console.log('Comment item:', item); // Pour le débogage
+    console.log('Comment item:', item); 
     return (
       <View style={styles.commentRow}>
         <Image 

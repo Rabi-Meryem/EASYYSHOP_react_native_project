@@ -1,8 +1,8 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { initializeAuth, getReactNativePersistence, getAuth } from "firebase/auth";
+import { initializeAuth, getReactNativePersistence, getAuth } from "firebase/auth";//pour initializeAuth il demare l authentification et getReactnativepersistence il sauvgarde la connexion et pour getauth il recupere une auth deja existante
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Your web app's Firebase configuration
+// configuration de firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDp9lCwttkbYxS2gHQQ5V0IrcjEXOS-QLc",
   authDomain: "easyshop-da665.firebaseapp.com",
@@ -13,11 +13,11 @@ const firebaseConfig = {
 };
 
 // Initialisation conditionnelle de Firebase
-let app;
-let authInstance;
+let app;//aplication firebase
+let authInstance;//conexion user
 
 // Vérifier si une application Firebase est déjà initialisée
-if (getApps().length === 0) {
+if (getApps().length === 0) {// on verifie si firebase existe deja 
   // Si aucune application n'est initialisée, on en crée une nouvelle
   app = initializeApp(firebaseConfig);
   authInstance = initializeAuth(app, {
@@ -43,7 +43,7 @@ if (getApps().length === 0) {
 export const auth = authInstance;
 
 // API URL
-export const API_URL = "http://192.168.194.151:5000/api";
+  //export const API_URL = "http://192.168.194.151:5000/api";
 
 // Fonctions posts
 export const getPosts = () => fetch(`${API_URL}/posts`).then(res => res.json());

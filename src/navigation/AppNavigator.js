@@ -4,10 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import AddPostScreen from "../screens/AddPostScreen";
-import EditProfileScreen from "../screens/EditProfileScreen";
 
-// Screens
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import HomeScreen from "../screens/HomeScreen";
@@ -15,6 +12,9 @@ import SearchScreen from "../screens/SearchScreen";
 import MessagesScreen from "../screens/MessagesScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import CommentScreen from "../screens/CommentScreen";
+import AddPostScreen from "../screens/AddPostScreen";
+import EditProfileScreen from "../screens/EditProfileScreen";
+
 
 
 const Stack = createNativeStackNavigator();

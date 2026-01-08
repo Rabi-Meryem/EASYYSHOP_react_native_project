@@ -50,15 +50,22 @@ export default function SignUpScreen({ navigation }) {
 
   const handleSignUp = async () => {
     try {
+      // D'abord, on crée l'utilisateur Firebase
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
-
       console.log("Firebase User créé :", firebaseUser.uid);
 
+      // Ensuite, on enregistre les informations supplémentaires dans votre base de données
       const response = await fetch("http://192.168.0.115:5000/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firebaseUid: firebaseUser.uid, name, email, profilePicture, role }),
+        body: JSON.stringify({ 
+          firebaseUid: firebaseUser.uid, 
+          name, 
+          email, 
+          profilePicture, 
+          role 
+        }),
       });
 
       const data = await response.json();
