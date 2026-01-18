@@ -41,15 +41,3 @@ if (getApps().length === 0) {// on verifie si firebase existe deja
 }
 
 export const auth = authInstance;
-
-// API URL
-  //export const API_URL = "http://192.168.194.151:5000/api";
-
-// Fonctions posts
-export const getPosts = () => fetch(`${API_URL}/posts`).then(res => res.json());
-export const likePost = (postId, userId) =>
-  fetch(`${API_URL}/posts/${postId}/like`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({userId}) });
-export const commentPost = (postId, userId, text) =>
-  fetch(`${API_URL}/posts/${postId}/comment`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({userId, text}) });
-export const savePost = (postId, userId) =>
-  fetch(`${API_URL}/posts/${postId}/save`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({userId}) });

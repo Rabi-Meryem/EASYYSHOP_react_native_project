@@ -148,5 +148,33 @@ router.post("/delete-comment", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+// Dans votre fichier de routes (ex: routes/posts.js)
+router.delete('/:postId', async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Non autorisé' });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post non trouvé' });
+    }
+
+    // Vérifier que l'utilisateur est le propriétaire du post
+    if (post.userId !== userId) {
+      return res.status(403).json({ message: 'Non autorisé à supprimer ce post' });
+    }
+
+    await Post.findByIdAndDelete(postId);
+    res.json({ message: 'Post supprimé avec succès' });
+
+  } catch (error) {
+    console.error('Erreur lors de la suppression du post:', error);
+    res.status(500).json({ message: 'Erreur lors de la suppression du post' });
+  }
+});
 
 module.exports = router;
